@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo Moje Linije</title>
+</head>
+<body>
+    <p>Demo MojeLinije</p>
+    <div id="search_interface">
+        <div id="search_form">
+            <form action="" method="get">
+                <label for="source">Start:</label><br>
+                <input type="text" id="source" name="source"><br>
+                <label for="destination">Cilj:</label><br>
+                <input type="text" id="destination" name="destination">
+
+                <button type="submit">Najdi poti</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="display">
+        <div id="stops">
+            {% for stop in stops %}
+            <p>{{stop}}</p>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>
+
+<style>
+    body {
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        overflow: hidden;
+
+        background-color: grey;
+    }
+
+    #search_interface {
+        background-color: white;
+        width: 800px;
+        height: 300px;
+    
+        position: absolute;
+        bottom: 0px;
+        left: 100px
+    }
+
+    #search_form {
+        width: 30%;
+        height: 100%;
+        margin: auto;
+    }
+
+    #search_form form {
+        position: relative;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    input[type=text] {
+        width: 100%;
+        box-sizing: border-box;
+        height: 35px;
+        border-radius: 16px;
+        border: 1px solid rgb(47, 0, 255);
+        margin-bottom: 10px;
+    }
+
+    button {
+        width: 100%;
+        box-sizing: border-box;
+        height: 35px;
+        border-radius: 16px;
+        border: 1px solid rgb(47, 0, 255);
+        background-color: rgb(47, 0, 255);
+        color: white;
+    }
+</style>

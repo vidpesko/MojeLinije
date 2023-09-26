@@ -1,0 +1,16 @@
+What each file in GTFS does:
+    -agency.txt = General information about agencies that operate PT
+
+    -routes.txt = General information about each route in PT (route name, route operator,...). There is also route_type field: 3 = bus, 2 = rail
+
+    -trips.txt = Information about each trip of the bus. Difference between route and trip: route is a path on which specific bus/train rides (e.g.: Line 7, Line Škofja Loka-Kranj). It is independent of time and day. If we also provide timetable (e.g.: at 9:00 every Saturday), that we get a trip
+
+    -stop_times.txt = Times for each trip when bus/train comes and goes from station, with the stop id to identify station on trip. It has stop_sequence field, which is used to identify the order of stations/stops. This field value increases (but it doesnt have to sequentially- e.g.: 1,2,5,23,40,...)
+
+    -calendar.txt = All defined schedule combinations. USED TO DEFINE DAYS IN SPECIFIC TIMEFRAME
+
+    -calendar_dates.txt = Expections for calendar.txt. It can have two values: 1 = Service was added for specified date. 2 = Service was remove for specified date. SERVICE_ID in both of these files should be the same
+
+    -stops.txt = All stops with names and coordinates
+
+    -shapes.txt = Coordinates of the route (every turn, used for mapping on the map). It has shape_pt_sequence field, which is used to identify the order of turns/directions. This field value increases (but it doesnt have to sequentially- e.g.: 1,2,5,23,40,...)

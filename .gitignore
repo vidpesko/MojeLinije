@@ -1,0 +1,8 @@
+# Ignore private files
+venv/
+.idea/
+.DS_Store
+Planner/__pycache__/
+Planner/gtfs_copy/
+Planner/Cache/
+node_modules/

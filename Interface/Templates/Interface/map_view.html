@@ -1,0 +1,1099 @@
+{% extends 'main.html' %}
+
+{% load static %}
+
+
+{% block content %}
+
+<div class="container-fluid gx-0" id="outer">
+    <!-- ? Map -->
+    <div id="map-container">
+        <div id="map">
+
+        </div>
+    </div>
+
+    <!-- ? Custom map controls - recenter btn -->
+    <div id="custom-map-controls">
+        <button class="btn btn-primary mt-3" id="recenter-btn">recenter</button>
+    </div>
+
+    <!-- ? Input -->
+    <div id="navigation-form-container" class="">
+        <!-- * Normal - if no search was excecuted -->
+        <div class="navigation-form-holder w-100 to-hide-spinner">
+            <form action="" class="w-100 p-2" id="navigation-form">
+                <button type="button" id="close-paths" hidden><i class="bi bi-x-square"></i></button>
+
+                <div class="my-3">
+                    <label for="source-input" class="form-label">Vnesi začetno postajo</label>
+                    <input type="text" class="form-control" id="source-input" oninput="sourceInputEvent()"
+                        placeholder="Primer: Mlaka Pri Kranju" aria-describedby="sourceInput" value="1121307">
+                    <div id="source-input-recommedations" class="input-recommendations p-2" hidden>
+
+                    </div>
+                    <!-- <div id="sourceInput" class="form-text">We'll never share your email with anyone else.</div> -->
+                </div>
+                <div class="mb-3">
+                    <label for="dest-input" class="form-label">Vnesi končno postajo</label>
+                    <input type="text" class="form-control" id="dest-input" oninput="inputHappend('dest-input-recommedations')"
+                        placeholder="Primer: Škofja Loka" aria-describedby="destInput" value="1122692">
+                    <div id="dest-input-recommedations">
+
+                    </div>
+                    <!-- <div id="destInput" class="form-text">We'll never share your email with anyone else.</div> -->
+                </div>
+
+                <!-- ? Search options -->
+                <hr>
+
+                <!-- & When to dep/arr time input -->
+                <div class="input-group mb-3">
+                    <!-- <input type="text" class="form-control" placeholder="Recipient's username"
+                        aria-label="Recipient's username" aria-describedby="button-addon2"> -->
+                    <input type="number" class="form-control" id="dep-time-input" oninput="showCurrentTime()"
+                        placeholder="12:00" aria-describedby="type-current-time" value="720">
+                    <button class="btn btn-outline-success" type="button" id="type-current-time"
+                        onclick="typeCurrentTime()">Zdaj <i class="bi bi-watch"></i></button>
+                </div>
+
+                <hr>
+                <button type="button" class="btn btn-primary" id="get-routes-btn">Najdi</button>
+                <h4 id="source-error-display" hidden></h4>
+                <h4 id="dest-error-display" hidden></h4>
+                <button type="button" class="btn btn-outline-danger" id="clear-search" hidden>Počisti <i
+                        class="bi bi-radioactive"></i></button>
+
+            </form>
+        </div>
+
+        <!-- * When search is excecuted -->
+        <div id="possible-paths" hidden class="w-100 h-100 to-hide-spinner">
+            <div class="w-100 p-2 h-100" id="paths-container">
+                <h4>Najdene poti:</h4>
+            </div>
+        </div>
+
+        <!-- ? Spinner -->
+        <div id="spinner" hidden>
+            <div class="">
+                <i class="fa-solid fa-compass fa-spin fa-xl"></i>
+            </div>
+            <!-- <p>Iščem poti...</p> -->
+        </div>
+    </div>
+
+    <!-- ? Floating bottom navbar -->
+    <div id="navbar" class="container-fluid">
+        <div id="navbar-icons-container" class="row justify-content-around">
+            <button class="navbar-icon-button col-4 text-center navbar-icon first-icon" data-bs-toggle="tooltip"
+                data-bs-title="Poglej si potencial" data-bs-custom-class="custom-tooltip"><i
+                    class="bi bi-stars"></i></button>
+            <button class="navbar-icon-button col-4 text-center navbar-icon middle-icon" data-bs-toggle="tooltip"
+                data-bs-title="Navigator" data-bs-custom-class="custom-tooltip"><i class="bi bi-map-fill"></i></button>
+            <button id="explore-container-btn" class="navbar-icon-button col-4 text-center navbar-icon last-icon"
+                data-bs-toggle="tooltip" data-bs-title="Razišči" data-bs-custom-class="custom-tooltip"><i
+                    class="bi bi-house-heart-fill" onclick="toggleExploreModal()"></i></button>
+        </div>
+    </div>
+
+    <!-- ? Explore modal -->
+    <div id="explore-container" hidden class="h-100 w-100">
+        <div id="explore" class="container">
+            <button onclick="toggleExploreModal()" id="explore-modal-close"><i
+                    class="fa-solid fa-rectangle-xmark w-100 h-100"></i></button>
+            <div class="w-75 mx-auto">
+                <div id="explore-quick" class="row m-0 w-100">
+                    <h3>Hitri dostop:</h3>
+                    <div class="col explore-card d-flex align-items-center justify-content-between me-2"
+                        id="explore-home">
+                        <div class="d-flex align-items-center">
+                            <!-- icon -->
+                            <i class="fa-solid fa-igloo fa-xl align-middle"></i>
+                            <!-- title -->
+                            <h4 class="m-0">Pojdi domov</h4>
+                        </div>
+                        <!-- seach -->
+                        <div class="">
+                            <button class="btn btn-primary">
+                                <i class="fa-solid fa-play m-0 p-0"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col explore-card d-flex align-items-center justify-content-between me-2"
+                        id="explore-work">
+                        <div class="d-flex align-items-center">
+                            <!-- icon -->
+                            <i class="fa-solid fa-umbrella-beach fa-xl"></i>
+
+                            <!-- title -->
+                            <h4 class="m-0">Pojdi na delo</h4>
+                        </div>
+                        <!-- seach -->
+                        <div class="">
+                            <button class="btn btn-primary">
+                                <i class="fa-solid fa-play m-0 p-0"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div id="explore-all" class="row">
+                    <div class="col explore-card d-flex align-items-center justify-content-between me-2"
+                        id="explore-home">
+                        <div class="d-flex align-items-center">
+                            <!-- icon -->
+                            <i class="fa-solid fa-hippo fa-xl"></i>
+                            <!-- title -->
+                            <h4 class="m-0">Živalski vrt</h4>
+                        </div>
+                        <!-- seach -->
+                        <div class="">
+                            <button class="btn btn-primary">
+                                <i class="fa-solid fa-play m-0 p-0"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col explore-card d-flex align-items-center justify-content-between me-2"
+                        id="explore-work">
+                        <div class="d-flex align-items-center">
+                            <!-- icon -->
+                            <i class="fa-solid fa-cart-shopping fa-xl"></i>
+                            <!-- title -->
+                            <h4 class="m-0">Pojdi v shopping</h4>
+                        </div>
+                        <!-- seach -->
+                        <div class="">
+                            <button class="btn btn-primary">
+                                <i class="fa-solid fa-play m-0 p-0"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ! Scripts -->
+<script>
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+
+    submitBtn = document.getElementById('get-routes-btn');
+    navigationFormContainer = document.getElementById('navigation-form-container');
+    navigationForm = document.getElementById('navigation-form');
+
+    closePathsBtn = document.getElementById('close-paths');
+    clearSearchBtn = document.getElementById('clear-search');
+    sourceInput = document.getElementById('source-input');
+    destInput = document.getElementById('dest-input');
+
+    depTimeInput = document.getElementById('dep-time-input');
+    chooseCurrentTimeBtn = document.getElementById('type-current-time');
+
+    exploreModal = document.getElementById('explore-container');
+
+
+    function togglePathSearch() {
+        navigationFormContainer.classList.add('executed-search');
+        navigationForm.classList.add('executed-search-form');
+        document.getElementById('possible-paths').hidden = false;
+        closePathsBtn.hidden = false;
+    }
+
+    submitBtn.onclick = function () {
+        togglePathSearch();
+        handleFormSearch();
+    }
+
+    closePathsBtn.onclick = function () {
+        navigationFormContainer.classList.remove('executed-search');
+        navigationForm.classList.remove('executed-search-form');
+        document.getElementById('possible-paths').hidden = true;
+        closePathsBtn.hidden = true;
+    }
+
+    function createClearSearchBtn() {
+        if (sourceInput.value.length == 0 && destInput.value.length == 0) {
+            clearSearchBtn.hidden = true;
+        } else {
+            clearSearchBtn.hidden = false;
+        }
+    }
+
+    function getSearchRecommendations(query, elementToAppend, inputElemId) {
+        $.ajax({
+            type: 'GET',
+            url: `/api/autocomplete/?query=${query}&num=5&format=json`,
+            success: function (response) {
+                var recommendations = response['recommedations'];
+                console.log(recommendations)
+                for (var i = 0; i<recommendations.length; i++) {
+                    var rec = recommendations[i];
+                    var recHtml = `
+                    <p>${rec}</p> <i class="bi bi-geo-alt-fill" onclick="handleRecommedationsClick('${rec}', '${inputElemId}')"></i>
+                    `;
+                    var recElem = document.createElement('div');
+
+                    recElem.classList.add('r');
+                    recElem.innerHTML = recHtml;
+                    elementToAppend.appendChild(recElem)
+                }
+            },
+            error: function (error) { console.log(error) }
+        });
+    }
+
+    function handleRecommedationsClick(value, inputElemId) {
+        document.getElementById(inputElemId).value = value;
+    }
+
+    function sourceInputEvent() {
+        var inputId = 'source-input';
+
+        createClearSearchBtn();
+
+        var elementToAppend = document.getElementById('source-input-recommedations');
+        elementToAppend.hidden = false;
+        var sourceInput = document.getElementById(inputId);
+        var query = sourceInput.value;
+        if (query.length > 0) {
+            elementToAppend.innerHTML = '';
+            getSearchRecommendations(query, elementToAppend, inputId)
+        } else {
+            elementToAppend.innerHTML = '';
+            elementToAppend.hidden = true;
+        }
+    }
+
+    function getCurrentTime() {
+        const date = new Date();
+        const hour = date.getHours();
+        const min = date.getMinutes();
+        return (hour * 60) + min
+    }
+
+    function showCurrentTime() {
+        if (depTimeInput.value == getCurrentTime()) {
+            chooseCurrentTimeBtn.disabled = true;
+        } else {
+            chooseCurrentTimeBtn.disabled = false;
+        }
+    }
+
+    function typeCurrentTime() {
+        depTimeInput.value = getCurrentTime()
+        chooseCurrentTimeBtn.disabled = true;
+    }
+
+    clearSearchBtn.onclick = function () {
+        sourceInput.value = '';
+        destInput.value = '';
+        clearSearchBtn.hidden = true;
+    }
+
+    function toggleExploreModal() {
+        if (exploreModal.hidden == true) {
+            exploreModal.hidden = false;
+        } else {
+            exploreModal.hidden = true;
+        }
+    }
+
+    function checkForSearchUrl() {
+        const searchByUrl = '{{ search_by_url }}';
+        if (searchByUrl == 'True') {
+            togglePathSearch();
+            sendRouteSearch('{{source}}', '{{dest}}', '{{source_type}}', '{{dest_type}}');
+        }
+    }
+
+    function addPossiblePath(name, transfers, dep_t, arr_t) {
+        var htmlCode = `<div class="possible-path row w-100 p-0 m-0 text-center rounded">
+            <h6>${name}</h6>
+            <div class="col">
+                <p>${dep_t}<br><i class="bi bi-arrow-down-short"></i><br>${arr_t}</p>
+            </div>
+            <div class="col">
+                <p><i class="bi bi-arrow-left-right"></i></p>
+                <p>${transfers}</p>
+            </div>
+            <div class="col">
+                <p>Vrsta vozil:</p>
+                <i class="bi bi-bus-front-fill"></i>, <i class="bi bi-train-front-fill"></i>
+            </div>
+            <div id="${name}TimeTable" class="container px-1 mt-2" hidden>
+            </div>
+            <button id="first-path-name" onclick="focusOnPath('${name}')">Explore</button>
+        </div>`
+
+        const pathDiv = document.createElement("div");
+        pathDiv.innerHTML = htmlCode;
+        var divContainer = document.getElementById('paths-container');
+        divContainer.appendChild(pathDiv);
+    }
+
+    function getInputType(input) {
+        // Convert val to int if it is number
+        var value = +input;
+        rType = 'int';
+        // If it is not a number
+        if (isNaN(value) == true) {
+            value = input;
+            rType = 'str';
+        }
+        return { 'type': rType, 'value': value }
+    }
+
+    function inputValidation(val, errorFunc, htmlEl) {
+        var isError = false;
+        var rType;
+        var msg = '';
+        var value;
+
+        if (val == '') {
+            msg = 'empty';
+            isError = true;
+        } else if (val.trim() == '') {
+            msg = 'Kaksna praznina';
+            isError = true;
+        }
+
+        val = getInputType(val);
+
+        if (isError == true) {
+            errorFunc(msg, htmlEl);
+        }
+        return { 'error': isError, 'type': val['type'], 'value': val['value'] }
+    }
+
+    function modifyUrl(newUrl) {
+        window.history.pushState("", "", newUrl);
+    }
+
+    function inCaseOfInputError(errorText, htmlEl) {
+        htmlEl.innerHTML = errorText;
+        htmlEl.hidden = false;
+    }
+
+    function handleFormSearch() {
+        var depTime = document.getElementById('dep-time-input').value;
+
+        sourceErrorDisplay = document.getElementById('source-error-display');
+        destErrorDisplay = document.getElementById('dest-error-display');
+        var sourceValidation = inputValidation(sourceInput.value, inCaseOfInputError, sourceErrorDisplay);
+        var destValidation = inputValidation(destInput.value, inCaseOfInputError, destErrorDisplay);
+
+        if (sourceValidation['error'] == true || destValidation['error'] == true) {
+            console.log('very bad')
+            return
+        }
+
+        // Change url to reflect search
+        var newUrl = `/?source=${sourceValidation['value']}&source_type=${sourceValidation['type']}&dest=${destValidation['value']}&dest_type=${destValidation['type']}`;
+        modifyUrl(newUrl);
+        sendRouteSearch(sourceValidation['value'], destValidation['value'], depTime, sourceValidation['type'], destValidation['type']);
+    }
+
+
+    // Loader
+    var spinner = document.getElementById('spinner');
+    var toHide = document.getElementsByClassName('to-hide-spinner');
+
+    function startLoader() {
+        for (var i = 0; i < toHide.length; i++) {
+            toHide[i].classList.add('style-for-spinner');
+        }
+        spinner.hidden = false;
+    }
+
+    function stopLoader() {
+        spinner.hidden = true;
+        for (var i = 0; i < toHide.length; i++) {
+            toHide[i].hidden = false;
+        }
+    }
+
+
+    // Google Maps section
+    var firstStation = { 'id': 0 };
+    var allMarkers = {};
+    var clusterfick = {};
+    var loadedStations = false;
+    var foundRoutes = {};
+    var map;
+    var pathCoordinates = {};
+    var formattedCoordinates = {};
+    var formattingCoordsDone = false;
+
+    // All used icons
+    const ICON_LINKS = {
+        'bus_station_min': '{% static "map_assets/icons/bus_station_min.png" %}',
+        'train_station_min': '{% static "map_assets/icons/train_station_min.png" %}',
+        'bus_station': '{% static "map_assets/icons/bus_station.png" %}',
+        'bus_station_start': '{% static "map_assets/icons/bus_station_start.png" %}',
+        'bus_station_finish': '{% static "map_assets/icons/bus_station_finish.png" %}',
+        'bus_station_hidden': '{% static "map_assets/icons/bus_station_hidden.png" %}'
+    }
+
+    // Slovenian and other special characters
+    const SPECIAL_CHAR = [['š', '&#x161;'], ['č', '&#269;'], ['ž', '&#382;'], ['Š', '&#352;'], ['Ž', '&#381;'], ['Č', '&#268;'], ['"', '']];
+
+    function replaceSpecialChar(word) {
+        for (var i = 0; i < SPECIAL_CHAR.length; i++) {
+            word = word.replaceAll(SPECIAL_CHAR[i][0], SPECIAL_CHAR[i][1]);
+        }
+        return word
+    }
+
+    function convertTime(minPastMidnight) {
+        var m = minPastMidnight % 60;
+        var h = (minPastMidnight - m) / 60;
+        var hf = parseInt(h);
+        var mf = parseInt(m);
+        if (h < 10) {
+            hf = `0${parseInt(h)}`;
+        }
+        if (m < 10) {
+            mf = `0${parseInt(m)}`;
+        }
+        return `${hf}:${mf}`
+    }
+
+    // var firstBtn = document.getElementById('first-path')
+
+
+    const SLO_BORDER_STYLE = {
+        'strokeColor': 'blue',
+        'strokeWeight': 2,
+    }
+
+    const OTHER_COUNTRY_STYLE = {
+        'strokeColor': '#000055',
+        'strokeWeight': 1,
+        'fillColor': '#000000',
+        'fillOpacity': 0.6
+    }
+
+    const MUNICIPALITY_STYLE = {
+        'strokeColor': 'red',
+        'strokeWeight': 2,
+        // 'fillColor': '#00ff00',
+        'fillOpacity': 0.6
+    }
+
+    const SLO_BOUNDS = {
+        north: 46.95,
+        south: 45.4,
+        west: 13.296389,
+        east: 16.701944,
+    }
+
+
+    function changeClusterfickMarkers(cl) {
+        for (var i = 0; i < cl.markers_.length; i++) {
+            cl.markers_[i].setIcon(ICON_LINKS['bus_station_hidden']);
+            // cl.markers_[i].setVisible(false);
+        }
+    }
+
+    function showClusterfick(cl) {
+        cl.markers_ = cl.myHiddenMarkers;
+    }
+
+    function hideClusterfick(cl) {
+        cl.myHiddenMarkers = cl.markers_;
+        cl.markers_ = [];
+    }
+
+    function createCenterControl(map, where) {
+        const controlButton = document.getElementById("recenter-btn");
+
+        controlButton.addEventListener("click", () => {
+            map.setCenter(where);
+            map.setZoom(9);
+            showClusterfick(clusterfick['cluster']);
+        });
+        return controlButton;
+    }
+
+    function addMarkerInfo(marker, name, id, vehicleType, infoWindow, map) {
+        marker.addListener("mouseover", () => {
+            infoWindow.setContent(
+                '<div id="content">' +
+                '<div id="siteNotice">' +
+                "</div>" +
+                `<h1 id="firstHeading" class="firstHeading">${name} - ${id}</h1>` +
+                '<div id="bodyContent">' +
+                `<p>${vehicleType}</p>` +
+                "</div>" +
+                "</div>"
+            );
+            infoWindow.open({
+                anchor: marker,
+                map,
+            });
+        });
+
+        marker.addListener("mouseout", () => {
+            infoWindow.close();
+            document.getElementById("source-input").focus();
+            // document.getElementById("source-input").blur();
+        });
+    }
+
+    function triggerInfoWindow(marker) {
+
+    }
+
+    function zoomToMarkers(markers, map) {
+        var bound = new google.maps.LatLngBounds();
+
+        for (var i = 0; i < markers.length; i++) {
+            bound.extend(markers[i]);
+        }
+        map.fitBounds(bound, 300);
+    }
+
+    function showStationMultipleStops(stopName, map, stopId = null) {
+        stopName = replaceSpecialChar(stopName);
+        var midMarker = allMarkers[stopName];
+        var neededMarker = null;
+
+        for (const [key, value] of Object.entries(midMarker.stopMarkers)) {
+            if (key == stopId) {
+                neededMarker = value;
+            }
+            value.setMap(map);
+        }
+        return neededMarker
+    }
+
+    function hideStationMultipleStops(stopName, map, stopId = null) {
+        var midMarker = allMarkers[stopName];
+        console.log(midMarker.stopMarkers)
+
+        for (const [key, value] of Object.entries(midMarker.stopMarkers)) {
+            value.setMap(null);
+        }
+    }
+
+    function loadStations(map) {
+        const infoWindow = new google.maps.InfoWindow({
+            content: '',
+            ariaLabel: "Station",
+        });
+        map.data.loadGeoJson('{% static "map_assets/GeoJson/ijpp_stations_new.json" %}', null, function (features) {
+            var i = 0;
+            var markers = features.map(function (feature) {
+                var g = feature.getGeometry();
+                var vehicleType = feature.getProperty('bus_train');
+                var name = feature.getProperty('stop_name');
+                var id = feature.getProperty('stop_ids');
+                var stationType = feature.getProperty('station_type');
+
+                if (stationType == 'single_stop') {
+                    var marker = new google.maps.Marker({ 'position': g.get(), 'data': feature, 'icon': ICON_LINKS['bus_station_min'], 'clickable': true });
+                    allMarkers[id] = marker;
+
+                    addMarkerInfo(marker, name, id, vehicleType, infoWindow, map);
+
+                    // Select a station
+                    // marker.addListener("click", () => {
+                    //     console.log(marker)
+                    //     // If one station is already selected - choosing the second one
+                    //     if (firstStation['id'] != 0) {
+                    //         marker.setIcon('https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png');
+                    //         // ENOUGH DATA - execute search
+                    //         console.log(firstStation['id'])
+                    //         console.log(id)
+                    //         // sendStations(firstStation['id'], id);
+
+                    //     } else {
+                    //         marker.setIcon('https://w7.pngwing.com/pngs/722/1011/png-transparent-logo-icon-instagram-logo-instagram-logo-purple-violet-text-thumbnail.png');
+                    //         firstStation['id'] = id;
+                    //     }
+                    // });
+                } else {
+                    var midpointCoord = g.g[g.g.length - 1];
+                    var midpointMarker = new google.maps.Marker({ 'position': midpointCoord, 'data': feature, 'icon': ICON_LINKS['bus_station_min'], 'clickable': true });
+                    midpointMarker.areStopsShown = false;
+                    addMarkerInfo(midpointMarker, name, id, vehicleType, infoWindow, map);
+
+                    midpointMarker.stopMarkers = {};
+                    for (var c = 0; c < (g.g.length - 1); c++) {
+                        var stopCoordinate = g.g[c];
+
+                        // var stopId = id[c];
+                        var m = new google.maps.Marker({ 'position': stopCoordinate, 'data': this.data, 'icon': ICON_LINKS['bus_station_hidden'], 'clickable': true });
+                        addMarkerInfo(m, name, id[c], vehicleType, infoWindow, map);
+
+                        midpointMarker.stopMarkers[id[c]] = m;
+                    }
+
+                    google.maps.event.addListener(midpointMarker, 'click', function () {
+                        var name = this.data.getProperty('stop_name');
+                        var stopsCoords = this.data.getGeometry();
+                        stopsCoords = stopsCoords.g;
+
+                        if (this.areStopsShown == false) {
+                            showStationMultipleStops(name, map)
+                            zoomToMarkers(stopsCoords, map);
+
+                            this.areStopsShown = true;
+                        } else {
+                            hideStationMultipleStops(name, map);
+                            for (var c = 0; c < this.stopMarkers.length; c++) {
+                                this.stopMarkers[c].setMap(null);
+                            }
+                            this.areStopsShown = false;
+                        }
+                    });
+
+                    allMarkers[name] = midpointMarker;
+
+                    var marker = midpointMarker;
+                }
+                i++;
+                if (i == features.length) {
+                    loadedStations = true;
+                }
+                return marker;
+            });
+
+            // var markerCluster = new markerClusterer.MarkerClusterer(map, markers);
+            // const imagePath = "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m";
+            const imagePath = "{% static 'map_assets/cluster_icons' %}/m";
+            var clusterStyles = [
+                {
+                    textColor: 'white',
+                    url: "{% static 'map_assets/cluster_icons/c1.png' %}",
+                    height: 50,
+                    width: 50
+                },
+                {
+                    textColor: 'white',
+                    url: "{% static 'map_assets/cluster_icons/c2.png' %}",
+                    height: 90,
+                    width: 90
+                },
+                {
+                    textColor: 'white',
+                    url: "{% static 'map_assets/cluster_icons/m3.png' %}",
+                    height: 66,
+                    width: 65
+                }
+            ];
+            const markerClusterer = new MarkerClusterer(map, markers, { imagePath: imagePath, gridSize: 100, maxZoom: 14, ignoreHiddenMarkers: true, styles: clusterStyles });
+            clusterfick['cluster'] = markerClusterer;
+            // return markers
+        });
+        map.data.setStyle({ visible: false });
+    }
+
+    function hideMarkers(markers) {
+        for (let i = 0; i < markers.length; i++) {
+            markers[i].setMap(null);
+        }
+    }
+
+    async function myMap() {
+        const sloCenter = new google.maps.LatLng(46.119944, 14.815333);
+        var mapProp = {
+            center: sloCenter,
+            // restriction: {
+            //     latLngBounds: SLO_BOUNDS,
+            //     strictBounds: false,
+            // },
+            zoom: 9,
+            // disableDefaultUI: true,
+            mapId: '223555717bccec41',
+            clickableIcons: false,
+            gestureHandling: 'greedy',
+        };
+        map = new google.maps.Map(document.getElementById("map"), mapProp);
+
+        // ? Drawing a border around SLO
+        const countryLayer = map.getFeatureLayer(google.maps.FeatureType.COUNTRY);
+        countryLayer.style = (options) => {
+            if (options.feature.placeId == 'ChIJYYOWXuckZUcRZdTiJR5FQOc') {
+                return SLO_BORDER_STYLE
+            } else {
+                return OTHER_COUNTRY_STYLE
+            }
+        }
+
+
+        // Code for regions of Slovenia
+        var bounds = {}
+        map.data.loadGeoJson('{% static "map_assets/GeoJson/regije_slo.geojson" %}', null, function (features) {
+
+            var regions = features.map(function (feature) {
+                var bound = new google.maps.LatLngBounds();
+                var g = feature.getGeometry();
+                g.forEachLatLng(function (e) {
+                    bound.extend(e);
+
+                });
+                var region_name = feature.getProperty('SR_UIME');
+                bounds[region_name] = bound;
+            });
+        });
+        map.data.setStyle({
+            strokeColor: 'green',
+            strokeWeight: 2,
+            fillOpacity: 0
+        });
+        map.data.addListener('click', (e) => {
+            map.fitBounds(bounds[e.feature.getProperty('SR_UIME')]);
+            loadStations(map);
+        });
+
+
+        // Button to center map
+        const centerControlDiv = document.getElementById('custom-map-controls');
+        const centerControl = createCenterControl(map, sloCenter);
+        map.controls[google.maps.ControlPosition.TOP_CENTER].push(centerControlDiv);
+
+        // firstBtn.onclick = function () { sendStations(1121307, 1122692, map); }
+        checkForSearchUrl();
+    }
+
+    const every_nth = (arr, nth) => arr.filter((e, i) => i % nth === nth - 1);
+
+    function getRawCoordinates(coords) {
+        var newCoords = [];
+        for (var i = 0; i < coords.length; i++) {
+            // console.log(coords[i])
+            var pathCoords = [];
+            for (var n = 0; n < coords[i].length; n++) {
+                // newCoords.push({ 'lat': coords[i][n]['lat'], 'lng': coords[i][n]['lng'] });
+                pathCoords.push([coords[i][n]['lat'], coords[i][n]['lng']]);
+            }
+            // console.log(pathCoordinates)
+            if (pathCoords.length != 0) {
+                newCoords.push(pathCoords);
+            }
+        }
+        // newCoords = every_nth(newCoords, 5)
+        return newCoords
+    }
+
+    function formatCoordinatesToLatLng(coords) {
+        var newCoords = []
+        coords = coords.snappedPoints;
+        for (var n = 0; n < coords.length; n++) {
+            var coord = coords[n].location;
+            newCoords.push({ 'lat': coord.latitude, 'lng': coord.longitude });
+
+            // newCoords.push({ 'lat': coords[n][0], 'lng': coords[n][1] });
+        }
+        return newCoords
+    }
+
+    function snapCoordinatesToRoads(coords, path_name) {
+        var isLastPath = false;
+
+        for (var n = 0; n < coords.length; n++) {
+            if ((n + 1) == coords.length) {
+                isLastPath = true;
+            }
+            var connectionCoords = coords[n];
+            snapPathCoordinates(connectionCoords, path_name, n, isLstPath = isLastPath);
+        }
+    }
+
+    function snapPathCoordinates(pathCoords, path_name, indexOfPath, isLastPath = false) {
+        var chunkSize = 95;
+        var _firstStation = 0;
+        var isLast = false;
+
+        for (var i = 0; i < pathCoords.length; i += chunkSize) {
+            if (i == 0) {
+                _firstStation = pathCoords[0];
+            }
+            if ((isLastPath == true) && ((i + chunkSize) >= pathCoords.length)) {
+                isLast = true;
+            }
+            // if (((i + chunkSize) >= connectionCoords.length) && (n + 1 == coords.length)) {
+            // isLast = true;
+            // }
+            snapToRoadsCall(pathCoords.slice(i, i + chunkSize), path_name, indexOfPath, _firstStation = _firstStation, isLast = isLast);
+        }
+    }
+
+    async function snapToRoadsCall(coords, path_name, indexOfPath, _firstStation = 0, isLast = false) {
+        // ! First coord (which is coord of station) should be excluded/remained intact from snap to roads algo
+        var path = coords.join('|');
+        $.get('https://roads.googleapis.com/v1/snapToRoads', {
+            interpolate: true,
+            key: '{{GOOGLE_MAPS_API_KEY}}',
+            path: path
+        }, function (data) {
+            data = formatCoordinatesToLatLng(data);
+
+            // Add previously stored station coord
+            if (_firstStation != 0) {
+                var station = { lat: _firstStation[0], lng: _firstStation[1] }
+                data.splice(0, 0, station);
+            }
+
+            // Adding newly received data to coordinate array
+            // formattedCoordinates[path_name] = formattedCoordinates[path_name].concat(data);
+            // formattedCoordinates[path_name].splice(indexOfPath, 0, ...data);
+            formattedCoordinates[path_name][indexOfPath] = data;
+
+            if (isLast == true) {
+                // console.log('here')
+                formattingCoordsDone = true;
+            }
+        });
+        // response = response.text();
+    }
+
+    function fillArrayWithPlaceholders(path_name, coordinates) {
+        for (var n = 0; n < coordinates.length; n++) {
+            formattedCoordinates[path_name].push([]);
+        }
+    }
+
+    function unpack2dArray(array) {
+        var newArr = []
+        for (var n = 0; n < array.length; n++) {
+            newArr.push(...array[n]);
+        }
+        return newArr
+    }
+
+    function prepareCoordinatesForPath(path_name) {
+        var coordinates = pathCoordinates[path_name];
+        formattedCoordinates[path_name] = [];
+        coordinates = getRawCoordinates(coordinates);
+        fillArrayWithPlaceholders(path_name, coordinates);
+
+        // formattedCoordinates[path_name] = formatCoordinatesToLatLng(coordinates[2]);
+        // formattedCoordinates[path_name].concat(formatCoordinatesToLatLng(coordinates[1]))
+        // formattingCoordsDone = true;
+        // return
+        snapCoordinatesToRoads(coordinates, path_name);
+        // if (formattingCoordsDone == true) {
+        // console.log('gehehhe')
+        // formattedCoordinates[path_name] = formatCoordinatesToLatLng(formattedCoordinates[path_name]);
+        // }
+    }
+
+    // var intervalID = window.setInterval(function d() {console.log(formattingCoordsDone); console.log(loadedStations)}, 500);
+
+    function highlightMarker(marker) {
+        marker.unhighlightedIcon = marker.getIcon();
+        marker.isHighlighted = true;
+        marker.setIcon(ICON_LINKS['bus_station_finish']);
+    }
+    
+    function unHighlightMarker(marker) {
+        marker.isHighlighted = false;
+        marker.setIcon(marker.unhighlightedIcon);
+    }
+
+    function addHighlights(elems, marker) {
+        for (var i = 0; i  < elems.length; i++) {
+            addHighlight(elems[i], marker);
+        }
+    }
+
+    function addHighlight(elem, marker) {
+        marker.isHighlighted = false;
+        elem.addEventListener('mouseover', function() {
+            if (marker.isHighlighted == false) {
+                highlightMarker(marker);
+            }
+        });
+        elem.addEventListener('mouseout', function () {
+            if (marker.isHighlighted == true) {
+                unHighlightMarker(marker);
+            }
+        });
+    }
+
+    function focusOnPath(path_name, trying = false) {
+        var bound = new google.maps.LatLngBounds();
+        var stops = foundRoutes[path_name]['stops'];
+        // Place first marker
+        if ((loadedStations == false) && (trying == false) && (formattingCoordsDone == true)) {
+            loadStations(map);
+            focusOnPath(path_name, trying = true);
+        } else if (((trying == true) || (formattingCoordsDone == false)) && (loadedStations == false)) {
+            setTimeout(function () {
+                focusOnPath(path_name, true);
+            }, 50);
+        }
+
+        // hideMarkers(allMarkers);
+        var usedMarkers = [];
+
+        stop_id = stops[0]['stop_id'];
+        stop_name = stops[0]['stop_name'];
+        marker = showStationMultipleStops(stop_name, map, stopId = stop_id);
+        // marker = allMarkers[stop_id];
+        // if (marker === undefined) {
+        //     focusOnPath(path_name, trying = false)
+        // }
+        var coordinates = formattedCoordinates[path_name];
+        coordinates = unpack2dArray(coordinates);
+
+        // First marker
+        marker.setIcon(ICON_LINKS['bus_station_start']);
+        clusterfick['cluster'].removeMarker(marker);
+        marker.setMap(map);
+
+        usedMarkers.push(marker);
+        
+        var lastMarkerPos = {};
+
+        bound.extend(marker.position);
+        for (var i = 1; i < stops.length; i++) {
+            station = stops[i];
+            isTransferStop = station['transfer'];
+            stop_id = stops[i]['stop_id'];
+            stop_name = stops[i]['stop_name'];
+            marker = showStationMultipleStops(stop_name, map, stopId = stop_id);
+            // marker = allMarkers[stop_id];
+            if (isTransferStop == true) {
+                marker.setIcon('https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png');
+            }
+            if (i == (stops.length - 1)) {
+                marker.setIcon(ICON_LINKS['bus_station_finish']);
+                lastMarkerPos = { 'lat': marker.getPosition().lat(), 'lng': marker.getPosition().lng() };
+                coordinates.push(lastMarkerPos);
+            }
+            clusterfick['cluster'].removeMarker(marker);
+            marker.setMap(map);
+
+            bound.extend(marker.position);
+            usedMarkers.push(marker);
+        }
+
+        // for (var i = 0; i < .length; i++) {
+        // coordinates.push(marker.position);
+        hideClusterfick(clusterfick['cluster']);
+        // hideClusterfick(clusterfick['cluster']);
+        // drawMarkers(coordinates);
+        drawPath(coordinates);
+        map.fitBounds(bound, 300);
+
+        // Show timetable
+        var connections = foundRoutes[path_name]['connections'];
+        var pathTimeTable = document.getElementById(`${path_name}TimeTable`);
+        pathTimeTable.hidden = false;
+        for (var i = 1; i < stops.length; i++) {
+            var conLookup = `${i}-${i + 1}`;
+            var connection = connections[conLookup];
+            var depTime = convertTime(connection['departure_time']);
+            var arrTime = convertTime(connection['arrival_time']);
+            var m1 = usedMarkers[i-1];
+            var m2 = usedMarkers[i];
+
+            var conHTML = `
+                <div class="col-3">
+                    <div class="timetable-station-highlight rounded-start ${path_name}TimeTable${i}">${i}</div>
+                </div>
+                <div class="col-6">
+                    <p>${depTime} <i class="bi bi-arrow-right-square"></i> ${arrTime}</p>
+                </div>
+                <div class="col-3">
+                    <div class="timetable-station-highlight rounded-end ${path_name}TimeTable${i + 1}">${i + 1}</div>
+                </div>
+            `;
+
+            var conElement = document.createElement('div');
+            conElement.classList.add('row', 'mb-2', 'mx-1', 'py-2', 'border', 'border-primary', 'rounded')
+            conElement.innerHTML = conHTML;
+            
+            pathTimeTable.appendChild(conElement);
+
+            var s1 = document.getElementsByClassName(`${path_name}TimeTable${i}`);
+            var s2 = document.getElementsByClassName(`${path_name}TimeTable${i+1}`);
+            addHighlights(s1, m1);
+            addHighlights(s2, m2);
+        }
+    }
+
+    function drawMarkers(coordinates) {
+        console.log(coordinates)
+        const infoWindow = new google.maps.InfoWindow({
+            content: '',
+            ariaLabel: "path",
+        });
+        for (var i = 0; i < coordinates.length; i++) {
+            var c = coordinates[i];
+            // c = {'lat': c[0], 'lng': c[1]}
+            // console.log(c)
+            var marker = new google.maps.Marker({ 'position': c });
+            marker.setMap(map);
+            addMarkerInfo(marker, i, i, i, infoWindow, map)
+        }
+    }
+
+    function drawPath(coordinates) {
+        const outerPath = new google.maps.Polyline({
+            path: coordinates,
+            geodesic: true,
+            strokeColor: "#FFFFFF",
+            strokeOpacity: 1.0,
+            strokeWeight: 7,
+        });
+
+        const innerPath = new google.maps.Polyline({
+            path: coordinates,
+            geodesic: true,
+            strokeColor: "#0C6FFD",
+            strokeOpacity: 1.0,
+            strokeWeight: 4,
+        });
+
+        // Trying to display info on line
+        innerPath.addListener("mouseover", () => {
+            console.log("heeyah");
+        });
+        innerPath.setMap(map);
+        outerPath.setMap(map);
+    }
+
+    // Sending source/dest to server
+    function sendRouteSearch(station_1, station_2, dep_time, s_type, d_type) {
+        startLoader();
+        $.ajax({
+            type: 'GET',
+            url: `/api/path/?source=${station_1}&destination=${station_2}&source_type=${s_type}&dest_type=${d_type}&dep_time=${dep_time}&format=json`,
+            success: function (response) {
+                stopLoader();
+                // console.log(Object.keys(response.routes))
+                var routes = response.routes;
+                for (var i = 0; i < routes.length; i++) {
+                    route = routes[i];
+                    r_name = route['name']
+                    transfers = route['transfers'];
+                    dep_t = route['departure_time'];
+                    arr_t = route['arrival_time'];
+                    foundRoutes[r_name] = {};
+                    foundRoutes[r_name]['stops'] = route['stops'];
+                    foundRoutes[r_name]['connections'] = route['connections'];
+                    pathCoordinates[r_name] = [];
+                    // for (var n = 0; n < Object.keys(route['connections']).length; n++) {
+                    //     console.log(con)
+                    // }
+                    for (const [key, value] of Object.entries(route['connections'])) {
+                        var con = value['coordinates'];
+                        pathCoordinates[r_name].push(con);
+                    }
+                    prepareCoordinatesForPath(r_name);
+                    addPossiblePath(r_name, transfers, dep_t, arr_t);
+                }
+            },
+            error: function (error) { console.log(error) }
+        });
+    }
+</script>
+
+{% endblock content %}
