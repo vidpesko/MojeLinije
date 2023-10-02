@@ -1,6 +1,7 @@
 import sys
 sys.path.append("..")
 from Planner.GraphImplementation.playing_with_algorithms_WORKING import d_algo, get_stop_name
+from MojeLinije.SECRET import GOOGLE_MAPS_API_KEY
 
 from django.shortcuts import render
 

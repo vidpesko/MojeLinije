@@ -5,6 +5,41 @@
 
 {% block content %}
 
+
+<!-- ! Modals -->
+<!-- ? Add saved destination -->
+<div class="modal fade" id="add-saved-destination" tabindex="-1" aria-labelledby="add-saved-destination-label"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="add-saved-destination-label">Shranite destinacijo</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="saved-destination-name" class="form-label">Ime destinacije</label>
+                        <input type="text" class="form-control" id="saved-destination-name"
+                            placeholder="Dom / šiht / ..." required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="saved-destination-address" class="form-label">Naslov destinacije / ime
+                            postaje</label>
+                        <input type="text" class="form-control" id="saved-destination-address"
+                            placeholder="Titova cesta 11, 4000 Kranj / Kranj AP" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Prekliči</button>
+                <button id="add-saved-dest-form-btn" type="button" class="btn btn-primary">Dodaj</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <div class="container-fluid gx-0" id="outer">
     <!-- ? Map -->
     <div id="map-container">
@@ -36,8 +71,9 @@
                 </div>
                 <div class="mb-3">
                     <label for="dest-input" class="form-label">Vnesi končno postajo</label>
-                    <input type="text" class="form-control" id="dest-input" oninput="inputHappend('dest-input-recommedations')"
-                        placeholder="Primer: Škofja Loka" aria-describedby="destInput" value="1122692">
+                    <input type="text" class="form-control" id="dest-input"
+                        oninput="inputHappend('dest-input-recommedations')" placeholder="Primer: Škofja Loka"
+                        aria-describedby="destInput" value="1122692">
                     <div id="dest-input-recommedations">
 
                     </div>
@@ -80,6 +116,34 @@
                 <i class="fa-solid fa-compass fa-spin fa-xl"></i>
             </div>
             <!-- <p>Iščem poti...</p> -->
+        </div>
+    </div>
+
+    <!-- ? Saved destinations -->
+    <div id="saved-destinations-menu" class="">
+        <div id="saved-destinations-icons" class="">
+            <div class="col-12" data-bs-toggle="tooltip" data-bs-title="Dom">
+                <button type="button">
+                    <i class="fa-solid fa-house"></i>
+                </button>
+            </div>
+            <div class="col-12" data-bs-toggle="tooltip" data-bs-title="Default tooltip">
+                <button type="button">
+                    <i class="fa-solid fa-briefcase"></i>
+                </button>
+            </div>
+            <div class="col-12">
+                <button type="button">
+                    <i class="fa-solid fa-plane-departure"></i>
+                </button>
+            </div>
+            <hr>
+            <div class="col-12" id="add-saved-destination-btn" data-bs-toggle="tooltip"
+                data-bs-title="Dodaj destinacijo">
+                <button type="button" data-bs-toggle="modal" data-bs-target="#add-saved-destination">
+                    <i class="fa-solid fa-plus"></i>
+                </button>
+            </div>
         </div>
     </div>
 
@@ -177,6 +241,7 @@
 
 <!-- ! Scripts -->
 <script>
+    // ! Enabled bootstrap tooltips
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
     const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
 
@@ -194,6 +259,28 @@
 
     exploreModal = document.getElementById('explore-container');
 
+
+    savedDestNameInp = document.getElementById('saved-destination-name');
+    savedDestAddrInp = document.getElementById('saved-destination-address');
+    addSavedDestFormBtn = document.getElementById('add-saved-dest-form-btn');
+    // ? Handle form submit
+    function addSavedDestinationForm() {
+        destName = savedDestNameInp.value;
+        destAddr = savedDestAddrInp.value;
+        if (destName != '' && destAddr != '') {
+            addSavedDestinationMenu(destName, destAddr);
+        } else {
+            console.log('Please write something smart...');
+        }
+    }
+    
+    // ? Add saved destination to the menu
+    function addSavedDestinationMenu(destName, destAddress) {
+
+    }
+    // ? Add saved destination to user profile
+
+    addSavedDestFormBtn.onclick = addSavedDestinationForm;
 
     function togglePathSearch() {
         navigationFormContainer.classList.add('executed-search');
@@ -229,7 +316,7 @@
             success: function (response) {
                 var recommendations = response['recommedations'];
                 console.log(recommendations)
-                for (var i = 0; i<recommendations.length; i++) {
+                for (var i = 0; i < recommendations.length; i++) {
                     var rec = recommendations[i];
                     var recHtml = `
                     <p>${rec}</p> <i class="bi bi-geo-alt-fill" onclick="handleRecommedationsClick('${rec}', '${inputElemId}')"></i>
@@ -890,21 +977,21 @@
         marker.isHighlighted = true;
         marker.setIcon(ICON_LINKS['bus_station_finish']);
     }
-    
+
     function unHighlightMarker(marker) {
         marker.isHighlighted = false;
         marker.setIcon(marker.unhighlightedIcon);
     }
 
     function addHighlights(elems, marker) {
-        for (var i = 0; i  < elems.length; i++) {
+        for (var i = 0; i < elems.length; i++) {
             addHighlight(elems[i], marker);
         }
     }
 
     function addHighlight(elem, marker) {
         marker.isHighlighted = false;
-        elem.addEventListener('mouseover', function() {
+        elem.addEventListener('mouseover', function () {
             if (marker.isHighlighted == false) {
                 highlightMarker(marker);
             }
@@ -948,7 +1035,7 @@
         marker.setMap(map);
 
         usedMarkers.push(marker);
-        
+
         var lastMarkerPos = {};
 
         bound.extend(marker.position);
@@ -991,7 +1078,7 @@
             var connection = connections[conLookup];
             var depTime = convertTime(connection['departure_time']);
             var arrTime = convertTime(connection['arrival_time']);
-            var m1 = usedMarkers[i-1];
+            var m1 = usedMarkers[i - 1];
             var m2 = usedMarkers[i];
 
             var conHTML = `
@@ -1009,11 +1096,11 @@
             var conElement = document.createElement('div');
             conElement.classList.add('row', 'mb-2', 'mx-1', 'py-2', 'border', 'border-primary', 'rounded')
             conElement.innerHTML = conHTML;
-            
+
             pathTimeTable.appendChild(conElement);
 
             var s1 = document.getElementsByClassName(`${path_name}TimeTable${i}`);
-            var s2 = document.getElementsByClassName(`${path_name}TimeTable${i+1}`);
+            var s2 = document.getElementsByClassName(`${path_name}TimeTable${i + 1}`);
             addHighlights(s1, m1);
             addHighlights(s2, m2);
         }

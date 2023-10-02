@@ -5,4 +5,6 @@ venv/
 Planner/__pycache__/
 Planner/gtfs_copy/
 Planner/Cache/
+Planner/GraphImplementation/SECRET.py
 node_modules/
+MojeLinije/SECRET.py

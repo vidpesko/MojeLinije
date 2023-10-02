@@ -1,6 +1,8 @@
 try:
+    from .SECRET import NEO4J_AUTH, NEO4J_URI
     from .utils import Helper
 except:
+    from .SECRET import NEO4J_AUTH, NEO4J_URI
     from utils import Helper
 
 from neo4j import GraphDatabase
@@ -70,8 +72,8 @@ class GTFS:
 
 class Neo4jDatabase:
     def __init__(self, db = 'ijppbus20230622') -> None:
-        self.URI = 'bolt://localhost:7687'
-        self.AUTH = ('neo4j', 'WordGesloVid123')
+        self.URI = NEO4J_URI
+        self.AUTH = NEO4J_AUTH
 
         # self.use_database = 'neo4j'
         self.use_database = db

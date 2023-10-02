@@ -107,6 +107,50 @@ body {
 }
 
 
+/* ? Saved destinations menu */
+#saved-destinations-menu {
+    position: absolute;
+    right: 0px;
+    top: 50%;
+    transform: translateY(-50%);
+
+    background-color: aliceblue;
+    border-top-left-radius: 16px;
+    border-bottom-left-radius: 16px;
+}
+
+#saved-destinations-menu #saved-destinations-icons {
+    width: 100%;
+}
+
+#saved-destinations-menu #saved-destinations-icons .col-12 {
+    padding: 8px;
+}
+
+#saved-destinations-menu #saved-destinations-icons .col-12 button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    background: #e9d362;
+    /* fallback for old browsers */
+    background: -webkit-linear-gradient(to right, #333333, #e9d362);
+    /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to right, #333333, #e9d362);
+    /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    
+    width: 100%;
+    height: 100%;
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid black;
+    color: white;
+}
+
+#saved-destinations-menu #add-saved-destination-btn button {
+    background: transparent !important;
+    color: black !important;
+}
 
 
 /* Navbar */
