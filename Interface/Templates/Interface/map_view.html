@@ -39,6 +39,37 @@
     </div>
 </div>
 
+<!-- ? Info modal -->
+<div class="modal fade" id="info-modal" tabindex="-1" aria-labelledby="info-modal-label"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="info-modal-label">Shranite destinacijo</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="saved-destination-name" class="form-label">Ime destinacije</label>
+                        <input type="text" class="form-control" id="saved-destination-name"
+                            placeholder="Dom / šiht / ..." required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="saved-destination-address" class="form-label">Naslov destinacije / ime
+                            postaje</label>
+                        <input type="text" class="form-control" id="saved-destination-address"
+                            placeholder="Titova cesta 11, 4000 Kranj / Kranj AP" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zapri</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <div class="container-fluid gx-0" id="outer">
     <!-- ? Map -->
@@ -122,24 +153,16 @@
     <!-- ? Saved destinations -->
     <div id="saved-destinations-menu" class="">
         <div id="saved-destinations-icons" class="">
-            <div class="col-12" data-bs-toggle="tooltip" data-bs-title="Dom">
-                <button type="button">
-                    <i class="fa-solid fa-house"></i>
-                </button>
-            </div>
-            <div class="col-12" data-bs-toggle="tooltip" data-bs-title="Default tooltip">
-                <button type="button">
-                    <i class="fa-solid fa-briefcase"></i>
-                </button>
-            </div>
-            <div class="col-12">
-                <button type="button">
-                    <i class="fa-solid fa-plane-departure"></i>
-                </button>
+            <div id="added-saved-destinations-wrapper">
+                <div id="saved-destination-1" class="col-12" data-bs-toggle="tooltip" data-bs-title="Dom">
+                    <button type="button">
+                        <i class="fa-solid fa-house"></i>
+                    </button>
+                    <i class="fa-solid fa-trash-can remove-saved-destination" onclick="removeSavedDestination('saved-destination-1')"></i>
+                </div>
             </div>
             <hr>
-            <div class="col-12" id="add-saved-destination-btn" data-bs-toggle="tooltip"
-                data-bs-title="Dodaj destinacijo">
+            <div class="col-12" id="add-saved-destination-btn" data-bs-toggle="tooltip" data-bs-title="Dodaj destinacijo">
                 <button type="button" data-bs-toggle="modal" data-bs-target="#add-saved-destination">
                     <i class="fa-solid fa-plus"></i>
                 </button>
@@ -242,8 +265,11 @@
 <!-- ! Scripts -->
 <script>
     // ! Enabled bootstrap tooltips
-    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    function enableAllTooltips() {
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    }
+    enableAllTooltips();
 
     submitBtn = document.getElementById('get-routes-btn');
     navigationFormContainer = document.getElementById('navigation-form-container');
@@ -263,6 +289,22 @@
     savedDestNameInp = document.getElementById('saved-destination-name');
     savedDestAddrInp = document.getElementById('saved-destination-address');
     addSavedDestFormBtn = document.getElementById('add-saved-dest-form-btn');
+    savedDestinationsDiv = document.getElementById('added-saved-destinations-wrapper');
+
+    numOfSavedDest = 2;
+
+    function htmlToElem(html) {
+        let temp = document.createElement('template');
+        html = html.trim(); // Never return a space text node as a result
+        temp.innerHTML = html;
+        return temp.content.firstChild;
+    }
+
+    function removeElement(id) {
+            var elem = document.getElementById(id);
+            return elem.parentNode.removeChild(elem);
+        }
+
     // ? Handle form submit
     function addSavedDestinationForm() {
         destName = savedDestNameInp.value;
@@ -273,11 +315,33 @@
             console.log('Please write something smart...');
         }
     }
-    
+
     // ? Add saved destination to the menu
     function addSavedDestinationMenu(destName, destAddress) {
+        var newDestination = `
+        <div id="saved-destination-${numOfSavedDest}" class="col-12" data-bs-toggle="tooltip" data-bs-title="${destName}">
+            <button type="button" onclick="handleSavedDestClick('${destAddress}', '${destName}')">
+                <i class="fa-solid fa-plane-departure"></i>
+            </button>
+            <i class="fa-solid fa-trash-can remove-saved-destination" onclick="removeSavedDestination('saved-destination-${numOfSavedDest}')"></i>
+        </div>`;
+        newDestination = htmlToElem(newDestination);
+        savedDestinationsDiv.appendChild(newDestination);
 
+        numOfSavedDest = numOfSavedDest + 1;
+        enableAllTooltips();
     }
+
+    // ? Remove saved destination
+    function removeSavedDestination(id) {
+        removeElement(id);
+    }
+
+    // ? Execute search when clicked
+    function handleSavedDestClick(address, name) {
+        writeDestination(address);
+    }
+
     // ? Add saved destination to user profile
 
     addSavedDestFormBtn.onclick = addSavedDestinationForm;
@@ -307,6 +371,10 @@
         } else {
             clearSearchBtn.hidden = false;
         }
+    }
+
+    function writeDestination(input, tagName='') {
+        destInput.value = input;
     }
 
     function getSearchRecommendations(query, elementToAppend, inputElemId) {

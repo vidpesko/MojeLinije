@@ -125,6 +125,7 @@ body {
 
 #saved-destinations-menu #saved-destinations-icons .col-12 {
     padding: 8px;
+    position: relative;
 }
 
 #saved-destinations-menu #saved-destinations-icons .col-12 button {
@@ -152,6 +153,22 @@ body {
     color: black !important;
 }
 
+#added-saved-destinations-wrapper .remove-saved-destination {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    font-size: 16px;
+    display: none;
+}
+
+#added-saved-destinations-wrapper .col-12:hover .remove-saved-destination {
+    display: block;
+}
+
+#added-saved-destinations-wrapper .col-12 .remove-saved-destination:hover {
+    color: red;
+    cursor: pointer;
+}
 
 /* Navbar */
 
