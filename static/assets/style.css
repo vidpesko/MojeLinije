@@ -25,7 +25,7 @@ body {
     position: fixed;
     left: 0px;
     top: 50px;
-    width: 24vw;
+    width: 14vw;
     transition: all 0.4s;
     transition-timing-function: ease-out;
 }
@@ -35,6 +35,13 @@ body {
     border-radius: 0px 8px 8px 0px;
     background-color: aliceblue;
     position: relative;
+}
+
+/* ? Vertical dotted line */
+#navigation-form-container #vertical-dotted-line {
+    height: 15px;
+    margin-left: 18px;
+    border-left: 3px dotted black;
 }
 
 
@@ -64,6 +71,14 @@ body {
 
 
 /* Possible paths + when search was executed */
+#possible-paths {
+    background-color: aliceblue;
+}
+
+#executed-search-header {
+    
+}
+
 .executed-search {
     top: 0px !important;
     height: 100% !important;
@@ -83,7 +98,6 @@ body {
 }
 
 #paths-container {
-    background-color: aliceblue;
 }
 
 #possible-paths .possible-path {
@@ -202,7 +216,7 @@ body {
     background-color: rgb(222, 220, 220);
 }
 
-#navbar .navbar-icon-button {
+#navbar .navbar-icon {
     color: black;
     border: 0;
     background-color: transparent;

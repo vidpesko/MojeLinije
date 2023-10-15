@@ -72,6 +72,7 @@ def get_path(request):
 @api_view(['GET'])
 def get_search_recommendations(request):
     get = request.GET
+    print(get)
     query = get['query']
     how_many = get['num']
 

@@ -40,28 +40,15 @@
 </div>
 
 <!-- ? Info modal -->
-<div class="modal fade" id="info-modal" tabindex="-1" aria-labelledby="info-modal-label"
-    aria-hidden="true">
+<div class="modal fade" id="info-modal" tabindex="-1" aria-labelledby="info-modal-label" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title fs-5" id="info-modal-label">Shranite destinacijo</h1>
+                <h1 class="modal-title fs-5" id="info-modal-label">O aplikaciji</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form>
-                    <div class="mb-3">
-                        <label for="saved-destination-name" class="form-label">Ime destinacije</label>
-                        <input type="text" class="form-control" id="saved-destination-name"
-                            placeholder="Dom / šiht / ..." required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="saved-destination-address" class="form-label">Naslov destinacije / ime
-                            postaje</label>
-                        <input type="text" class="form-control" id="saved-destination-address"
-                            placeholder="Titova cesta 11, 4000 Kranj / Kranj AP" required>
-                    </div>
-                </form>
+                <p>Nekaj pametnega povej (Chat GPT)</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zapri</button>
@@ -69,6 +56,39 @@
         </div>
     </div>
 </div>
+
+<!-- ? Settings modal -->
+<div class="modal fade" id="settings-modal" tabindex="-1" aria-labelledby="settings-modal-label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="settings-modal-label">Nastavitve</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Nastavi aplikacijo</p>
+
+                <p>Nastavi zemljevid</p>
+                <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+                    <input oninput="changeMapType('roadmap')" type="radio" class="btn-check" name="btnradio"
+                        id="btnradio1" autocomplete="off" checked>
+                    <label class="btn btn-outline-primary" for="btnradio1">Navadna mapa</label>
+
+                    <input oninput="changeMapType('satellite')" type="radio" class="btn-check" name="btnradio"
+                        id="btnradio2" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="btnradio2">Slikano iz satelita</label>
+
+                    <input type="radio" class="btn-check" name="btnradio" id="btnradio3" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="btnradio3">Radio 3</label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zapri</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 
 <div class="container-fluid gx-0" id="outer">
@@ -91,51 +111,82 @@
             <form action="" class="w-100 p-2" id="navigation-form">
                 <button type="button" id="close-paths" hidden><i class="bi bi-x-square"></i></button>
 
-                <div class="my-3">
-                    <label for="source-input" class="form-label">Vnesi začetno postajo</label>
-                    <input type="text" class="form-control" id="source-input" oninput="sourceInputEvent()"
-                        placeholder="Primer: Mlaka Pri Kranju" aria-describedby="sourceInput" value="1121307">
+                <!-- ? Source station input -->
+                <div id="source-input-container" class="">
+                    <div class="input-group">
+                        <span class="input-group-text" id="source-input-txt"><i
+                                class="fa-solid fa-circle-dot"></i></span>
+                        <input id="source-input" type="text" class="form-control" placeholder="Začetna postaja"
+                            oninput="sourceInputEvent()" value="1121307" aria-label="Ime začetne postaje"
+                            aria-describedby="source-input-txt">
+
+                    </div>
                     <div id="source-input-recommedations" class="input-recommendations p-2" hidden>
+                    </div>
+                </div>
+
+                <!-- ? Dotted line -->
+                <div class="">
+                    <div id="vertical-dotted-line" class="my-1">
 
                     </div>
-                    <!-- <div id="sourceInput" class="form-text">We'll never share your email with anyone else.</div> -->
                 </div>
-                <div class="mb-3">
-                    <label for="dest-input" class="form-label">Vnesi končno postajo</label>
-                    <input type="text" class="form-control" id="dest-input"
-                        oninput="inputHappend('dest-input-recommedations')" placeholder="Primer: Škofja Loka"
-                        aria-describedby="destInput" value="1122692">
-                    <div id="dest-input-recommedations">
 
+                <!-- ? Destination input -->
+                <div id="dest-input-container">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="dest-input-txt"><i
+                                class="fa-solid fa-flag-checkered"></i></span>
+                        <input id="dest-input" type="text" class="form-control" placeholder="Končna postaja"
+                            oninput="sourceInputEvent()" value="1122692" aria-label="Ime končne postaje"
+                            aria-describedby="dest-input-txt">
                     </div>
-                    <!-- <div id="destInput" class="form-text">We'll never share your email with anyone else.</div> -->
                 </div>
 
-                <!-- ? Search options -->
-                <hr>
-
-                <!-- & When to dep/arr time input -->
-                <div class="input-group mb-3">
-                    <!-- <input type="text" class="form-control" placeholder="Recipient's username"
-                        aria-label="Recipient's username" aria-describedby="button-addon2"> -->
-                    <input type="number" class="form-control" id="dep-time-input" oninput="showCurrentTime()"
-                        placeholder="12:00" aria-describedby="type-current-time" value="720">
-                    <button class="btn btn-outline-success" type="button" id="type-current-time"
-                        onclick="typeCurrentTime()">Zdaj <i class="bi bi-watch"></i></button>
-                </div>
-
-                <hr>
+                <!-- ? Search button -->
                 <button type="button" class="btn btn-primary" id="get-routes-btn">Najdi</button>
                 <h4 id="source-error-display" hidden></h4>
                 <h4 id="dest-error-display" hidden></h4>
                 <button type="button" class="btn btn-outline-danger" id="clear-search" hidden>Počisti <i
                         class="bi bi-radioactive"></i></button>
 
+                <!-- ? Search options -->
+                <hr>
+                <div id="search-options-container" class="text-center">
+                    <a onclick="changeShowOptionsIcon(this)" class="" data-bs-toggle="collapse"
+                        href="#collapsed-options" role="button" aria-expanded="false" aria-controls="collapsed-options">
+                        Možnosti iskanja
+                        <i id="show-options-icon" class="bi bi-caret-down-fill"></i>
+                    </a>
+                </div>
+                <div class="collapse mt-2" id="collapsed-options">
+                    <!-- & When to dep/arr time input -->
+                    <div class="mb-3">
+                        <label for="dep-time-mode" class="form-label">Izberi čas odhoda</label>
+                        <select id="dep-time-mode" class="form-select" aria-label="Izberi čas odhoda">
+                            <option value="now" selected>Odidi zdaj</option>
+                            <option value="choose-dep-time">Odidi ob:</option>
+                            <option value="choose-arr-time">Prispi ob:</option>
+                            <option value="3">Najkasnejša povezava na izbrani datum</option>
+                        </select>
+                        <input type="time" class="form-control mt-2" id="dep-time-input" value="">
+                    </div>
+
+                    <!-- & Choose date -->
+                    <div class="mb-3">
+                        <label for="dep-date-input" class="form-label">Izberi dan odhoda/prihoda</label>
+                        <input type="date" name="" id="dep-date-input" class="form-control" value="2023-06-20">
+                    </div>
+
+                </div>
             </form>
         </div>
 
         <!-- * When search is excecuted -->
         <div id="possible-paths" hidden class="w-100 h-100 to-hide-spinner">
+            <div id="executed-search-header">
+                <h1>Skofja -> Kranj</h1>
+            </div>
             <div class="w-100 p-2 h-100" id="paths-container">
                 <h4>Najdene poti:</h4>
             </div>
@@ -158,11 +209,13 @@
                     <button type="button">
                         <i class="fa-solid fa-house"></i>
                     </button>
-                    <i class="fa-solid fa-trash-can remove-saved-destination" onclick="removeSavedDestination('saved-destination-1')"></i>
+                    <i class="fa-solid fa-trash-can remove-saved-destination"
+                        onclick="removeSavedDestination('saved-destination-1')"></i>
                 </div>
             </div>
             <hr>
-            <div class="col-12" id="add-saved-destination-btn" data-bs-toggle="tooltip" data-bs-title="Dodaj destinacijo">
+            <div class="col-12" id="add-saved-destination-btn" data-bs-toggle="tooltip"
+                data-bs-title="Dodaj destinacijo">
                 <button type="button" data-bs-toggle="modal" data-bs-target="#add-saved-destination">
                     <i class="fa-solid fa-plus"></i>
                 </button>
@@ -173,14 +226,17 @@
     <!-- ? Floating bottom navbar -->
     <div id="navbar" class="container-fluid">
         <div id="navbar-icons-container" class="row justify-content-around">
-            <button class="navbar-icon-button col-4 text-center navbar-icon first-icon" data-bs-toggle="tooltip"
-                data-bs-title="Poglej si potencial" data-bs-custom-class="custom-tooltip"><i
-                    class="bi bi-stars"></i></button>
-            <button class="navbar-icon-button col-4 text-center navbar-icon middle-icon" data-bs-toggle="tooltip"
-                data-bs-title="Navigator" data-bs-custom-class="custom-tooltip"><i class="bi bi-map-fill"></i></button>
-            <button id="explore-container-btn" class="navbar-icon-button col-4 text-center navbar-icon last-icon"
+            <button class="navbar-icon-button col-4 text-center navbar-icon first-icon" type="button"
+                data-bs-toggle="modal" data-bs-target="#settings-modal"><i class="fa-solid fa-toolbox"></i></button>
+            <button class="navbar-icon-button col-4 text-center navbar-icon middle-icon"><i
+                    class="bi bi-map-fill"></i></button>
+            <!-- <button id="explore-container-btn" class="navbar-icon-button col-4 text-center navbar-icon last-icon"
                 data-bs-toggle="tooltip" data-bs-title="Razišči" data-bs-custom-class="custom-tooltip"><i
-                    class="bi bi-house-heart-fill" onclick="toggleExploreModal()"></i></button>
+                    class="bi bi-house-heart-fill" onclick="toggleExploreModal()"></i></button> -->
+            <button class="col-4 text-center navbar-icon last-icon" type="button" data-bs-toggle="modal"
+                data-bs-target="#info-modal">
+                <i class="fa-solid fa-circle-info"></i>
+            </button>
         </div>
     </div>
 
@@ -301,9 +357,9 @@
     }
 
     function removeElement(id) {
-            var elem = document.getElementById(id);
-            return elem.parentNode.removeChild(elem);
-        }
+        var elem = document.getElementById(id);
+        return elem.parentNode.removeChild(elem);
+    }
 
     // ? Handle form submit
     function addSavedDestinationForm() {
@@ -346,6 +402,27 @@
 
     addSavedDestFormBtn.onclick = addSavedDestinationForm;
 
+
+    // ! Code for time input in search form
+    var timeModeSelect = document.getElementById('dep-time-mode')
+
+    if (timeModeSelect.value == 'now') {
+        depTimeInput.value = getCurrentTime(formatted = true);
+        depTimeInput.disabled = true;
+    }
+
+    timeModeSelect.addEventListener('change', function handleChange(event) {
+        var value = event.target.value;
+
+        if (value == "now") {
+            depTimeInput.value = getCurrentTime(formatted = true);
+            depTimeInput.disabled = true;
+        } else {
+            depTimeInput.disabled = false;
+        }
+    });
+
+
     function togglePathSearch() {
         navigationFormContainer.classList.add('executed-search');
         navigationForm.classList.add('executed-search-form');
@@ -373,7 +450,17 @@
         }
     }
 
-    function writeDestination(input, tagName='') {
+    function changeShowOptionsIcon(el) {
+        var isShown = el.getAttribute('aria-expanded');
+        var optIcon = document.getElementById('show-options-icon');
+        if (isShown == 'true') {
+            optIcon.className = "bi bi-caret-up-fill";
+        } else {
+            optIcon.className = "bi bi-caret-down-fill";
+        }
+    }
+
+    function writeDestination(input, tagName = '') {
         destInput.value = input;
     }
 
@@ -422,10 +509,13 @@
         }
     }
 
-    function getCurrentTime() {
+    function getCurrentTime(formatted = false) {
         const date = new Date();
         const hour = date.getHours();
         const min = date.getMinutes();
+        if (formatted == true) {
+            return `${hour}:${min}`
+        }
         return (hour * 60) + min
     }
 
@@ -460,7 +550,7 @@
         const searchByUrl = '{{ search_by_url }}';
         if (searchByUrl == 'True') {
             togglePathSearch();
-            sendRouteSearch('{{source}}', '{{dest}}', '{{source_type}}', '{{dest_type}}');
+            sendRouteSearch('{{source}}', '{{dest}}', '{{input_time}}', '{{source_type}}', '{{dest_type}}', '{{type_of_time}}');
         }
     }
 
@@ -532,8 +622,16 @@
         htmlEl.hidden = false;
     }
 
+    // Function to convert time in hh:mm to minutes past midnight
+    function convertToMinPastMidnight(time) {
+        var components = time.split(':');
+        return parseInt((components[0] * 60)) + parseInt(components[1])
+    }
+
     function handleFormSearch() {
-        var depTime = document.getElementById('dep-time-input').value;
+        var inputTime = depTimeInput.value;
+        inputTime = convertToMinPastMidnight(inputTime);
+        var tType = timeModeSelect.value;
 
         sourceErrorDisplay = document.getElementById('source-error-display');
         destErrorDisplay = document.getElementById('dest-error-display');
@@ -546,9 +644,9 @@
         }
 
         // Change url to reflect search
-        var newUrl = `/?source=${sourceValidation['value']}&source_type=${sourceValidation['type']}&dest=${destValidation['value']}&dest_type=${destValidation['type']}`;
+        var newUrl = `/?source=${sourceValidation['value']}&source_type=${sourceValidation['type']}&dest=${destValidation['value']}&dest_type=${destValidation['type']}&t=${inputTime}&t_type=${tType}`;
         modifyUrl(newUrl);
-        sendRouteSearch(sourceValidation['value'], destValidation['value'], depTime, sourceValidation['type'], destValidation['type']);
+        sendRouteSearch(sourceValidation['value'], destValidation['value'], inputTime, sourceValidation['type'], destValidation['type']);
     }
 
 
@@ -862,7 +960,7 @@
             //     strictBounds: false,
             // },
             zoom: 9,
-            // disableDefaultUI: true,
+            disableDefaultUI: true,
             mapId: '223555717bccec41',
             clickableIcons: false,
             gestureHandling: 'greedy',
@@ -1071,6 +1169,10 @@
         });
     }
 
+    function changeMapType(type) {
+        map.setMapTypeId(type);
+    }
+
     function focusOnPath(path_name, trying = false) {
         var bound = new google.maps.LatLngBounds();
         var stops = foundRoutes[path_name]['stops'];
@@ -1216,11 +1318,11 @@
     }
 
     // Sending source/dest to server
-    function sendRouteSearch(station_1, station_2, dep_time, s_type, d_type) {
+    function sendRouteSearch(station_1, station_2, input_time, s_type, d_type, type_of_time) {
         startLoader();
         $.ajax({
             type: 'GET',
-            url: `/api/path/?source=${station_1}&destination=${station_2}&source_type=${s_type}&dest_type=${d_type}&dep_time=${dep_time}&format=json`,
+            url: `/api/path/?source=${station_1}&destination=${station_2}&source_type=${s_type}&dest_type=${d_type}&dep_time=${input_time}&format=json`,
             success: function (response) {
                 stopLoader();
                 // console.log(Object.keys(response.routes))
