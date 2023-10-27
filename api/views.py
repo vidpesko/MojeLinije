@@ -62,7 +62,7 @@ def get_path(request):
         second_stop_name = connections_values[-1]['station_b']
     route_name = f'{first_stop_name} -> {second_stop_name}'
 
-    output = {'routes': [
+    output = {'search_name': route_name, 'routes': [
         {'name': route_name, 'stops': stops, 'transfers': routes['transfers'], 'departure_time': routes['start_time'], 'arrival_time': routes['arrival_time'], 'connections': routes['route_connections']},
     ]
     }

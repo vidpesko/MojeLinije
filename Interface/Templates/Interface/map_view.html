@@ -185,7 +185,8 @@
         <!-- * When search is excecuted -->
         <div id="possible-paths" hidden class="w-100 h-100 to-hide-spinner">
             <div id="executed-search-header">
-                <h1>Skofja -> Kranj</h1>
+                <h1 id="search-header-main-text">Pridobivam rezultate...</h1>
+                <p><b>Datum:</b>23.05.2023 <i class="bi bi-dot"></i> <b>Cas:</b>13:43</p>
             </div>
             <div class="w-100 p-2 h-100" id="paths-container">
                 <h4>Najdene poti:</h4>
@@ -228,7 +229,8 @@
         <div id="navbar-icons-container" class="row justify-content-around">
             <button class="navbar-icon-button col-4 text-center navbar-icon first-icon" type="button"
                 data-bs-toggle="modal" data-bs-target="#settings-modal"><i class="fa-solid fa-toolbox"></i></button>
-            <button class="navbar-icon-button col-4 text-center navbar-icon middle-icon"><i
+            <button onclick="location.href = '/'"
+                class="navbar-icon-button col-4 text-center navbar-icon middle-icon"><i
                     class="bi bi-map-fill"></i></button>
             <!-- <button id="explore-container-btn" class="navbar-icon-button col-4 text-center navbar-icon last-icon"
                 data-bs-toggle="tooltip" data-bs-title="Razišči" data-bs-custom-class="custom-tooltip"><i
@@ -338,6 +340,8 @@
 
     depTimeInput = document.getElementById('dep-time-input');
     chooseCurrentTimeBtn = document.getElementById('type-current-time');
+
+    searchHeaderMainText = document.getElementById('search-header-main-text')
 
     exploreModal = document.getElementById('explore-container');
 
@@ -647,6 +651,11 @@
         var newUrl = `/?source=${sourceValidation['value']}&source_type=${sourceValidation['type']}&dest=${destValidation['value']}&dest_type=${destValidation['type']}&t=${inputTime}&t_type=${tType}`;
         modifyUrl(newUrl);
         sendRouteSearch(sourceValidation['value'], destValidation['value'], inputTime, sourceValidation['type'], destValidation['type']);
+    }
+
+    // Update search header to inputed data
+    function updateSearchHeader(name) {
+        searchHeaderMainText.innerHTML = name;
     }
 
 
@@ -1330,6 +1339,7 @@
                 for (var i = 0; i < routes.length; i++) {
                     route = routes[i];
                     r_name = route['name']
+                    updateSearchHeader(r_name);
                     transfers = route['transfers'];
                     dep_t = route['departure_time'];
                     arr_t = route['arrival_time'];
@@ -1338,7 +1348,7 @@
                     foundRoutes[r_name]['connections'] = route['connections'];
                     pathCoordinates[r_name] = [];
                     // for (var n = 0; n < Object.keys(route['connections']).length; n++) {
-                    //     console.log(con)
+                        //     console.log(con)
                     // }
                     for (const [key, value] of Object.entries(route['connections'])) {
                         var con = value['coordinates'];
